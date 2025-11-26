@@ -16,8 +16,8 @@
     }
   ],
   "env": {
-    "VITE_FIREBASE_API_KEY": "@vite_firebase_api_key",
+    "VITE_FIREBASE_API_KEY": "AIzaSyBign8zTUd9Y1Kvt5Hb50-tvS6gw19mHak",
     "VITE_FIREBASE_AUTH_DOMAIN": "@vite_firebase_auth_domain",
-    "VITE_FIREBASE_PROJECT_ID": "@vite_firebase_project_id"
+    "VITE_FIREBASE_PROJECT_ID": "umarock-95157"
   }
 }
