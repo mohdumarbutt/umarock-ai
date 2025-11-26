@@ -14,10 +14,5 @@
       "src": "/(.*)",
       "dest": "/$1"
     }
-  ],
-  "env": {
-    "VITE_FIREBASE_API_KEY": "",
-    "VITE_FIREBASE_AUTH_DOMAIN": "@vite_firebase_auth_domain",
-    "VITE_FIREBASE_PROJECT_ID": ""
-  }
+  ]
 }
