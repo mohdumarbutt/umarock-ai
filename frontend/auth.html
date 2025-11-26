@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication - UmaRock AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --border: #475569;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --border: #cbd5e1;
+        }
+
+        [data-theme="dark-green"] {
+            --bg-primary: #0d2818;
+            --bg-secondary: #1a3a24;
+            --bg-tertiary: #2d4a2f;
+            --text-primary: #e8f5e8;
+            --text-secondary: #c8e6c9;
+            --accent: #4caf50;
+            --accent-hover: #45a049;
+            --border: #4a6741;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .auth-container {
+            background-color: var(--bg-secondary);
+            border-color: var(--border);
+        }
+
+        .form-input {
+            background-color: var(--bg-tertiary);
+            border-color: var(--border);
+            color: var(--text-primary);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--border);
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="auth-container border rounded-lg p-8 max-w-md w-full">
+            <!-- Logo and Title -->
+            <div class="text-center mb-8">
+                <img src="resources/umarock-logo.png" alt="UmaRock AI" class="h-16 w-16 mx-auto mb-4">
+                <h2 class="text-3xl font-bold mb-2">UmaRock AI</h2>
+                <p class="text-gray-400">Professional AI Chat Application</p>
+            </div>
+
+            <!-- Auth Form -->
+            <div id="authForm">
+                <!-- Sign In Form -->
+                <div id="signInForm" class="space-y-6">
+                    <div>
+                        <label for="signInEmail" class="block text-sm font-medium mb-2">Email Address</label>
+                        <input 
+                            type="email" 
+                            id="signInEmail" 
+                            class="form-input w-full px-4 py-3 rounded-lg border"
+                            placeholder="Enter your email"
+                            required
+                        >
+                    </div>
+                    
+                    <div>
+                        <label for="signInPassword" class="block text-sm font-medium mb-2">Password</label>
+                        <input 
+                            type="password" 
+                            id="signInPassword" 
+                            class="form-input w-full px-4 py-3 rounded-lg border"
+                            placeholder="Enter your password"
+                            required
+                        >
+                    </div>
+                    
+                    <button 
+                        type="button" 
+                        id="signInBtn"
+                        class="btn-primary w-full py-3 rounded-lg font-medium"
+                    >
+                        <i class="fas fa-sign-in-alt mr-2"></i>Sign In
+                    </button>
+                </div>
+
+                <!-- Sign Up Form -->
+                <div id="signUpForm" class="space-y-6 hidden">
+                    <div>
+                        <label for="signUpName" class="block text-sm font-medium mb-2">Full Name</label>
+                        <input 
+                            type="text" 
+                            id="signUpName" 
+                            class="form-input w-full px-4 py-3 rounded-lg border"
+                            placeholder="Enter your full name"
+                            required
+                        >
+                    </div>
+                    
+                    <div>
+                        <label for="signUpEmail" class="block text-sm font-medium mb-2">Email Address</label>
+                        <input 
+                            type="email" 
+                            id="signUpEmail" 
+                            class="form-input w-full px-4 py-3 rounded-lg border"
+                            placeholder="Enter your email"
+                            required
+                        >
+                    </div>
+                    
+                    <div>
+                        <label for="signUpPassword" class="block text-sm font-medium mb-2">Password</label>
+                        <input 
+                            type="password" 
+                            id="signUpPassword" 
+                            class="form-input w-full px-4 py-3 rounded-lg border"
+                            placeholder="Enter your password"
+                            required
+                        >
+                    </div>
+                    
+                    <div>
+                        <label for="signUpConfirmPassword" class="block text-sm font-medium mb-2">Confirm Password</label>
+                        <input 
+                            type="password" 
+                            id="signUpConfirmPassword" 
+                            class="form-input w-full px-4 py-3 rounded-lg border"
+                            placeholder="Confirm your password"
+                            required
+                        >
+                    </div>
+                    
+                    <button 
+                        type="button" 
+                        id="signUpBtn"
+                        class="btn-primary w-full py-3 rounded-lg font-medium"
+                    >
+                        <i class="fas fa-user-plus mr-2"></i>Sign Up
+                    </button>
+                </div>
+
+                <!-- Form Toggle -->
+                <div class="mt-6 text-center">
+                    <p class="text-sm text-gray-400">
+                        <span id="toggleText">Don't have an account?</span>
+                        <button 
+                            type="button" 
+                            id="toggleFormBtn"
+                            class="text-blue-400 hover:text-blue-300 font-medium ml-1"
+                        >
+                            Sign Up
+                        </button>
+                    </p>
+                </div>
+
+                <!-- Demo Access -->
+                <div class="mt-6 p-4 bg-gray-700 rounded-lg">
+                    <h3 class="text-sm font-medium mb-2 text-center">Demo Access</h3>
+                    <p class="text-xs text-gray-400 text-center mb-3">Use these credentials for testing</p>
+                    <div class="space-y-2 text-xs">
+                        <div class="flex justify-between">
+                            <span>Email:</span>
+                            <span class="font-mono">demo@umarock.ai</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Password:</span>
+                            <span class="font-mono">demo123</span>
+                        </div>
+                    </div>
+                    <button 
+                        type="button" 
+                        id="demoBtn"
+                        class="btn-secondary w-full mt-3 py-2 rounded-lg text-sm"
+                    >
+                        <i class="fas fa-magic mr-2"></i>Use Demo Account
+                    </button>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="hidden text-center py-8">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
+                <p class="mt-2 text-gray-400">Processing...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class AuthManager {
+            constructor() {
+                this.isSignUp = false;
+                this.init();
+            }
+
+            init() {
+                this.bindEvents();
+            }
+
+            bindEvents() {
+                // Form toggle
+                document.getElementById('toggleFormBtn').addEventListener('click', () => {
+                    this.toggleForm();
+                });
+
+                // Sign In
+                document.getElementById('signInBtn').addEventListener('click', () => {
+                    this.handleSignIn();
+                });
+
+                // Sign Up
+                document.getElementById('signUpBtn').addEventListener('click', () => {
+                    this.handleSignUp();
+                });
+
+                // Demo access
+                document.getElementById('demoBtn').addEventListener('click', () => {
+                    this.handleDemoAccess();
+                });
+
+                // Enter key support
+                document.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        if (!this.isSignUp) {
+                            this.handleSignIn();
+                        } else {
+                            this.handleSignUp();
+                        }
+                    }
+                });
+            }
+
+            toggleForm() {
+                const signInForm = document.getElementById('signInForm');
+                const signUpForm = document.getElementById('signUpForm');
+                const toggleText = document.getElementById('toggleText');
+                const toggleBtn = document.getElementById('toggleFormBtn');
+
+                if (this.isSignUp) {
+                    // Switch to Sign In
+                    signUpForm.classList.add('hidden');
+                    signInForm.classList.remove('hidden');
+                    toggleText.textContent = "Don't have an account?";
+                    toggleBtn.textContent = "Sign Up";
+                } else {
+                    // Switch to Sign Up
+                    signInForm.classList.add('hidden');
+                    signUpForm.classList.remove('hidden');
+                    toggleText.textContent = "Already have an account?";
+                    toggleBtn.textContent = "Sign In";
+                }
+
+                this.isSignUp = !this.isSignUp;
+            }
+
+            async handleSignIn() {
+                const email = document.getElementById('signInEmail').value.trim();
+                const password = document.getElementById('signInPassword').value;
+
+                if (!email || !password) {
+                    this.showError('Please fill in all fields');
+                    return;
+                }
+
+                if (!this.isValidEmail(email)) {
+                    this.showError('Please enter a valid email address');
+                    return;
+                }
+
+                this.showLoading();
+
+                try {
+                    // Mock authentication - in production, this would use Firebase Auth
+                    await this.mockSignIn(email, password);
+                    
+                    // Store authentication state
+                    const user = {
+                        uid: this.generateUserId(),
+                        email: email,
+                        displayName: email.split('@')[0],
+                        photoURL: null,
+                        emailVerified: true
+                    };
+
+                    localStorage.setItem('authToken', this.generateToken());
+                    localStorage.setItem('user', JSON.stringify(user));
+                    
+                    // Redirect to main app
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+
+                } catch (error) {
+                    this.hideLoading();
+                    this.showError(error.message);
+                }
+            }
+
+            async handleSignUp() {
+                const name = document.getElementById('signUpName').value.trim();
+                const email = document.getElementById('signUpEmail').value.trim();
+                const password = document.getElementById('signUpPassword').value;
+                const confirmPassword = document.getElementById('signUpConfirmPassword').value;
+
+                if (!name || !email || !password || !confirmPassword) {
+                    this.showError('Please fill in all fields');
+                    return;
+                }
+
+                if (!this.isValidEmail(email)) {
+                    this.showError('Please enter a valid email address');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    this.showError('Password must be at least 6 characters long');
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    this.showError('Passwords do not match');
+                    return;
+                }
+
+                this.showLoading();
+
+                try {
+                    // Mock sign up - in production, this would use Firebase Auth
+                    await this.mockSignUp(name, email, password);
+                    
+                    // Auto sign in after successful registration
+                    const user = {
+                        uid: this.generateUserId(),
+                        email: email,
+                        displayName: name,
+                        photoURL: null,
+                        emailVerified: false
+                    };
+
+                    localStorage.setItem('authToken', this.generateToken());
+                    localStorage.setItem('user', JSON.stringify(user));
+                    
+                    // Redirect to main app
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+
+                } catch (error) {
+                    this.hideLoading();
+                    this.showError(error.message);
+                }
+            }
+
+            async handleDemoAccess() {
+                this.showLoading();
+
+                try {
+                    // Demo account credentials
+                    const demoUser = {
+                        uid: 'demo_user_123',
+                        email: 'demo@umarock.ai',
+                        displayName: 'Demo User',
+                        photoURL: 'https://i.ibb.co/fYy6FcL0/my-profile-pic.png',
+                        emailVerified: true,
+                        isDemo: true
+                    };
+
+                    localStorage.setItem('authToken', 'demo_token_123');
+                    localStorage.setItem('user', JSON.stringify(demoUser));
+                    
+                    // Pre-populate with demo chat history
+                    const demoChats = [
+                        {
+                            id: 'demo_chat_1',
+                            title: 'Welcome to UmaRock AI',
+                            messages: [
+                                {
+                                    role: 'user',
+                                    content: 'Hello! Can you tell me about UmaRock AI?',
+                                    timestamp: Date.now() - 3600000
+                                },
+                                {
+                                    role: 'assistant',
+                                    content: 'Hello! Welcome to UmaRock AI, a professional AI chat application developed by Umar Butt. This application provides access to advanced AI models including DeepSeek for intelligent conversations. You can chat, export conversations, bookmark responses, and enjoy a feature-rich AI experience.',
+                                    timestamp: Date.now() - 3500000
+                                }
+                            ],
+                            model: 'deepseek-r1-free',
+                            timestamp: Date.now() - 3600000,
+                            pinned: true,
+                            bookmarked: false,
+                            favorite: true
+                        }
+                    ];
+
+                    localStorage.setItem('chatHistory', JSON.stringify(demoChats));
+                    
+                    // Redirect to main app
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000);
+
+                } catch (error) {
+                    this.hideLoading();
+                    this.showError('Failed to access demo account');
+                }
+            }
+
+            // Mock authentication functions
+            async mockSignIn(email, password) {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        // Simulate authentication check
+                        if (email && password) {
+                            resolve();
+                        } else {
+                            reject(new Error('Invalid credentials'));
+                        }
+                    }, 1000);
+                });
+            }
+
+            async mockSignUp(name, email, password) {
+                return new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        // Simulate registration
+                        if (email && password && name) {
+                            resolve();
+                        } else {
+                            reject(new Error('Registration failed'));
+                        }
+                    }, 1000);
+                });
+            }
+
+            isValidEmail(email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+            }
+
+            generateUserId() {
+                return 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            }
+
+            generateToken() {
+                return 'token_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            }
+
+            showLoading() {
+                document.getElementById('authForm').classList.add('hidden');
+                document.getElementById('loadingState').classList.remove('hidden');
+            }
+
+            hideLoading() {
+                document.getElementById('loadingState').classList.add('hidden');
+                document.getElementById('authForm').classList.remove('hidden');
+            }
+
+            showError(message) {
+                // Simple alert for now - in production, use a proper notification system
+                alert(message);
+            }
+        }
+
+        // Initialize auth manager
+        document.addEventListener('DOMContentLoaded', () => {
+            new AuthManager();
+        });
+    </script>
+</body>
+</html>

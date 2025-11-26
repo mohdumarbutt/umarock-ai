@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UmaRock AI - Professional AI Chat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --border: #475569;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --border: #cbd5e1;
+        }
+
+        [data-theme="dark-green"] {
+            --bg-primary: #0d2818;
+            --bg-secondary: #1a3a24;
+            --bg-tertiary: #2d4a2f;
+            --text-primary: #e8f5e8;
+            --text-secondary: #c8e6c9;
+            --accent: #4caf50;
+            --accent-hover: #45a049;
+            --border: #4a6741;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .chat-container {
+            background-color: var(--bg-secondary);
+            border-color: var(--border);
+        }
+
+        .message {
+            background-color: var(--bg-tertiary);
+            border-color: var(--border);
+        }
+
+        .message.user {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .sidebar {
+            background-color: var(--bg-secondary);
+            border-color: var(--border);
+        }
+
+        .code-block {
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 8px 0;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .copy-btn:hover {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .loading-dots {
+            display: inline-block;
+        }
+
+        .loading-dots::after {
+            content: '';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .theme-selector {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .hidden { display: none; }
+        
+        .chat-input {
+            background-color: var(--bg-tertiary);
+            border-color: var(--border);
+            color: var(--text-primary);
+        }
+        
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <!-- Theme Selector -->
+    <div class="theme-selector">
+        <select id="themeSelect" class="bg-gray-700 text-white px-3 py-1 rounded-lg text-sm">
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+            <option value="dark-green">Dark Green</option>
+        </select>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-gray-800 border-b border-gray-700 px-4 py-3">
+        <div class="flex items-center justify-between max-w-7xl mx-auto">
+            <div class="flex items-center space-x-4">
+                <img src="resources/umarock-logo.png" alt="UmaRock AI" class="h-8 w-8">
+                <h1 class="text-xl font-bold text-white">UmaRock AI</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="newChatBtn" class="btn-primary px-4 py-2 rounded-lg text-sm">
+                    <i class="fas fa-plus mr-2"></i>New Chat
+                </button>
+                <button id="authBtn" class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg text-sm">
+                    <i class="fas fa-user mr-2"></i><span id="authText">Sign In</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="flex h-screen pt-16">
+        <!-- Sidebar -->
+        <div class="sidebar w-80 border-r flex flex-col">
+            <!-- Chat History -->
+            <div class="flex-1 overflow-y-auto p-4">
+                <h3 class="text-sm font-semibold text-gray-400 mb-3">Chat History</h3>
+                <div id="chatHistory" class="space-y-2">
+                    <!-- Chat history items will be populated here -->
+                </div>
+            </div>
+            
+            <!-- Sidebar Footer -->
+            <div class="border-t border-gray-700 p-4">
+                <div class="space-y-2">
+                    <button id="exportChatBtn" class="w-full text-left px-3 py-2 text-sm hover:bg-gray-700 rounded-lg">
+                        <i class="fas fa-download mr-2"></i>Export Chat
+                    </button>
+                    <button id="supportBtn" class="w-full text-left px-3 py-2 text-sm hover:bg-gray-700 rounded-lg">
+                        <i class="fas fa-headset mr-2"></i>Support
+                    </button>
+                    <button id="aboutBtn" class="w-full text-left px-3 py-2 text-sm hover:bg-gray-700 rounded-lg">
+                        <i class="fas fa-info-circle mr-2"></i>About Developer
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="flex-1 flex flex-col">
+            <!-- Model Selector -->
+            <div class="border-b border-gray-700 p-4">
+                <div class="flex items-center justify-between">
+                    <select id="modelSelect" class="bg-gray-700 text-white px-4 py-2 rounded-lg">
+                        <!-- Models will be populated here -->
+                    </select>
+                    <div class="flex items-center space-x-2">
+                        <button id="pinChatBtn" class="p-2 hover:bg-gray-700 rounded-lg">
+                            <i class="fas fa-thumbtack"></i>
+                        </button>
+                        <button id="bookmarkBtn" class="p-2 hover:bg-gray-700 rounded-lg">
+                            <i class="fas fa-bookmark"></i>
+                        </button>
+                        <button id="favoriteBtn" class="p-2 hover:bg-gray-700 rounded-lg">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages Container -->
+            <div id="messagesContainer" class="flex-1 overflow-y-auto p-4 space-y-4">
+                <div class="text-center text-gray-400 py-8">
+                    <i class="fas fa-robot text-4xl mb-4"></i>
+                    <h2 class="text-xl font-semibold mb-2">Welcome to UmaRock AI</h2>
+                    <p class="text-sm">Start a conversation with our advanced AI models</p>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="border-t border-gray-700 p-4">
+                <div class="flex items-end space-x-4">
+                    <textarea 
+                        id="messageInput" 
+                        placeholder="Type your message..." 
+                        class="chat-input flex-1 resize-none rounded-lg px-4 py-3 text-sm"
+                        rows="1"
+                    ></textarea>
+                    <button id="sendBtn" class="btn-primary px-6 py-3 rounded-lg">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <div class="flex items-center justify-between mt-2 text-xs text-gray-400">
+                    <span>Press Enter to send, Shift+Enter for new line</span>
+                    <div class="flex space-x-2">
+                        <button id="regenerateBtn" class="hover:text-white hidden">
+                            <i class="fas fa-redo mr-1"></i>Regenerate
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Developer Credits Modal -->
+    <div id="creditsModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+            <div class="text-center">
+                <img src="resources/profile-pic.png" alt="Umar Butt" class="w-20 h-20 rounded-full mx-auto mb-4">
+                <h3 class="text-xl font-bold mb-2">Umar Butt</h3>
+                <p class="text-gray-400 mb-4">Full-stack web/app developer skilled in Python, JS, C++, HTML/CSS. Building scalable apps from frontend to backend. Passionate about Innovative Tech AI.</p>
+                <div class="flex justify-center space-x-4 mb-4">
+                    <a href="https://github.com/mohdumarbutt" target="_blank" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-github text-xl"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/in/mohdumarbutt" target="_blank" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-linkedin text-xl"></i>
+                    </a>
+                    <a href="https://www.instagram.com/theumar_butt" target="_blank" class="text-gray-400 hover:text-white">
+                        <i class="fab fa-instagram text-xl"></i>
+                    </a>
+                    <a href="https://buymeacoffee.com/umarbutt" target="_blank" class="text-gray-400 hover:text-white">
+                        <i class="fas fa-coffee text-xl"></i>
+                    </a>
+                </div>
+                <button id="closeCredits" class="btn-primary px-4 py-2 rounded-lg">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="exportModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 class="text-lg font-bold mb-4">Export Chat</h3>
+            <div class="space-y-3">
+                <button id="exportPDF" class="w-full text-left px-4 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg">
+                    <i class="fas fa-file-pdf mr-3"></i>Export as PDF
+                </button>
+                <button id="exportDOCX" class="w-full text-left px-4 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg">
+                    <i class="fas fa-file-word mr-3"></i>Export as DOCX
+                </button>
+                <button id="exportTXT" class="w-full text-left px-4 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg">
+                    <i class="fas fa-file-alt mr-3"></i>Export as TXT (Markdown)
+                </button>
+            </div>
+            <button id="closeExport" class="mt-4 w-full bg-gray-600 hover:bg-gray-500 px-4 py-2 rounded-lg">Cancel</button>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+</html>
